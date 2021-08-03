@@ -1,8 +1,8 @@
 module.exports = {
-    "env": {
-        "es6": true
+    "parserOptions": {
+        "ecmaVersion": 8
     },
-    rules: {
+    "rules": {
         "indent": ["error", 4],
         "semi": ["error", "always"],
         "object-curly-spacing": ["error", "always"],
