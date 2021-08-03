@@ -5,6 +5,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 const routes = ['tickets', 'comments'];
 
+app.use(express.json());
+
 typeorm.createConnection()
     .then(connection => {
         Db.setInstance(connection);
