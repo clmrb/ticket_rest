@@ -1,5 +1,4 @@
-const Db = require('./../db');
-const connection = Db.getInstance();
+const connection = require('typeorm').getConnection();
 
 const TicketRepo = connection.getRepository('Ticket');
 
