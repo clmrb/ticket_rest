@@ -1,0 +1,28 @@
+{
+  "name": "Comment",
+  "columns": {
+    "id": {
+      "primary": true,
+      "type": "int",
+      "generated": true
+    },
+    "text": {
+      "type": "varchar"
+    },
+    "createdAt": {
+      "type": "datetime"
+    }
+  },
+  "relations": {
+    "ticket": {
+      "target": "Ticket",
+      "type": "many-to-one",
+      "cascade": true
+    },
+    "user": {
+      "target": "User",
+      "type": "many-to-one",
+      "cascade": true
+    }
+  }
+}
