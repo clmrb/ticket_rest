@@ -6,11 +6,15 @@ const routes = ['tickets', 'comments'];
 
 app.use(express.json());
 
-typeorm.createConnection()
-    .then(connection => {
+module.exports.ready = typeorm.createConnection()
+    .then(() => {
         routes.forEach(route => require(`./src/routes/${route}`)(app));
 
         app.listen(port, () => {
-            console.log(`App listening at http://localhost:${port}`);
+            if (process.env.NODE_ENV === 'dev') {
+                console.log(`App listening at http://localhost:${port}`);
+            }
         });
     });
+
+module.exports.server = app;

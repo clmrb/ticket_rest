@@ -27,4 +27,9 @@ node index.js
 
 ## Test
 
-TODO
+Tests made with chai and chai-http.
+
+To run tests :
+```bash
+npm test
+```
