@@ -16,7 +16,7 @@
   },
   "relations": {
     "ticket": {
-      "target": "User",
+      "target": "Ticket",
       "type": "one-to-many",
       "cascade": true
     }
