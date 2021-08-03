@@ -7,6 +7,6 @@ module.exports = (app) => {
     });
 
     app.post('/ticket', (req, res) => {
-        utils.handleResponse(() => TicketSvc.create(req.body), res);
+        utils.handleResponse(() => TicketSvc.create(req), res);
     });
 };
