@@ -1,10 +1,12 @@
 const typeorm = require('typeorm');
 const express = require('express');
+const middlewares = require('./src/middlewares');
 const app = express();
 const port = process.env.PORT || 3000;
 const routes = ['tickets', 'comments'];
 
 app.use(express.json());
+app.use(middlewares.verifyToken);
 
 module.exports.ready = typeorm.createConnection()
     .then(() => {
