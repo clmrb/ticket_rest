@@ -13,6 +13,11 @@ Do a clean install :
 npm ci
 ```
 
+Create/update tables by running needed db migrations :
+```bash
+typeorm migration:run
+```
+
 ## Development
 
 To run the API locally using nodemon :
