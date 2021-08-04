@@ -108,14 +108,14 @@ describe('Ticket', () => {
                 mail: 'test2@testdomain.com'
             });
 
-            ticketFromTest2 = await TicketRepo.create({
+            ticketFromTest2 = await TicketRepo.save({
                 user,
                 title: 'test',
                 description: 'test'
             });
         });
 
-        it('it should fail to update others ticket', async () => {
+        it('it should fail to update others ticket (401)', async () => {
             const res = await chai.request(server)
                 .put(`/ticket/${ticketFromTest2.id}`)
                 .set('Authorization', 'Bearer test@testdomain.com')
@@ -124,14 +124,14 @@ describe('Ticket', () => {
                     description: 'Ticket description updated'
                 });
 
-            res.should.have.status(404);
+            res.should.have.status(401);
             res.body.should.be.an('object');
             should.exist(res.body.message);
         });
 
-        it('it should fail to update unknown ticket', async () => {
+        it('it should fail to update unknown ticket (404)', async () => {
             const res = await chai.request(server)
-                .put('/ticket/455')
+                .put('/ticket/0')
                 .set('Authorization', 'Bearer test@testdomain.com')
                 .send({
                     title: 'Ticket test updated',
