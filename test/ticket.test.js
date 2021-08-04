@@ -4,7 +4,7 @@ const app = require('../index');
 const server = app.server;
 const ready = app.ready;
 
-chai.should();
+const should = chai.should();
 chai.use(chaiHttp);
 
 let connection = null;
@@ -43,7 +43,7 @@ describe('Ticket', () => {
                     res.should.have.status(401);
                     res.body.should.be.an('object');
 
-                    res.body.message.should.exist;
+                    should.exist(res.body.message);
                     done();
                 });
         });
@@ -60,7 +60,7 @@ describe('Ticket', () => {
                     res.should.have.status(401);
                     res.body.should.be.an('object');
 
-                    res.body.message.should.exist;
+                    should.exist(res.body.message);
                     done();
                 });
         });
@@ -93,13 +93,83 @@ describe('Ticket', () => {
                     res.should.have.status(500);
                     res.body.should.be.an('object');
 
-                    res.body.status.should.eql(500);
-                    res.body.message.should.exist;
+                    should.exist(res.body.message);
                     done();
                 });
         });
-
-        // finally empty user table
-        after(() => UserRepo.delete({}));
     });
+
+    describe('PUT /ticket/:id', () => {
+        let ticketFromTest2 = null;
+
+        before(async () => {
+            const user = await UserRepo.save({
+                username: 'test2',
+                mail: 'test2@testdomain.com'
+            });
+
+            ticketFromTest2 = await TicketRepo.create({
+                user,
+                title: 'test',
+                description: 'test'
+            });
+        });
+
+        it('it should fail to update others ticket', async () => {
+            const res = await chai.request(server)
+                .put(`/ticket/${ticketFromTest2.id}`)
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .send({
+                    title: 'Ticket test updated',
+                    description: 'Ticket description updated'
+                });
+
+            res.should.have.status(404);
+            res.body.should.be.an('object');
+            should.exist(res.body.message);
+        });
+
+        it('it should fail to update unknown ticket', async () => {
+            const res = await chai.request(server)
+                .put('/ticket/455')
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .send({
+                    title: 'Ticket test updated',
+                    description: 'Ticket description updated'
+                });
+
+            res.should.have.status(404);
+            res.body.should.be.an('object');
+            should.exist(res.body.message);
+        });
+
+        it('it should create and update the same ticket', async () => {
+            const { body: ticket } = await chai.request(server)
+                .post('/ticket')
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .send({
+                    title: 'Ticket test',
+                    description: 'Ticket description'
+                });
+
+            const res = await chai.request(server)
+                .put(`/ticket/${ticket.id}`)
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .send({
+                    title: 'Ticket test updated',
+                    description: 'Ticket description updated'
+                });
+
+            res.should.have.status(200);
+            res.body.should.be.an('object');
+
+            res.body.id.should.eql(ticket.id);
+            res.body.title.should.eql('Ticket test updated');
+            res.body.description.should.eql('Ticket description updated');
+            res.body.status.should.eql('todo');
+        });
+    });
+
+    // finally empty user table
+    after(() => UserRepo.delete({}));
 });
