@@ -10,8 +10,36 @@ module.exports = {
             user
         };
 
-        await TicketRepo.insert(ticket);
+        const { raw: insert } = await TicketRepo.insert(ticket);
 
-        return ticket;
+        return {
+            status: 200,
+            response: await TicketRepo.findOne({ where: { id: insert.insertId } })
+        };
+    },
+    async update({ body, params, user }) {
+        const where = { id: params.id };
+        const ticket = await TicketRepo.findOne({ where, relations: ['user'] });
+
+        if (!ticket) {
+            return {
+                status: 404,
+                response: { message: `ticket '${params.id}' not found` }
+            };
+        }
+
+        if (ticket.user.id !== user.id) {
+            return {
+                status: 401,
+                response: { message: `ticket '${params.id}' is not owned by current user` }
+            };
+        }
+
+        await TicketRepo.update(params.id, body);
+
+        return {
+            status: 200,
+            response: await TicketRepo.findOne({ where })
+        };
     }
 };

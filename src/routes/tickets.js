@@ -2,8 +2,8 @@ const TicketSvc = require('../services/tickets');
 const utils = require('../utils');
 
 module.exports = (app) => {
-    app.get('/tickets', (req, res) => {
-
+    app.put('/ticket/:id', (req, res) => {
+        utils.handleResponse(() => TicketSvc.update(req), res);
     });
 
     app.post('/ticket', (req, res) => {
