@@ -11,6 +11,9 @@
     },
     "createdAt": {
       "type": "datetime"
+    },
+    "updatedAt": {
+      "type": "datetime"
     }
   },
   "relations": {
