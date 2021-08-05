@@ -42,6 +42,31 @@ module.exports = {
             response: comments
         };
     },
+    async update({ body, params, user }) {
+        const where = { id: params.id };
+        const comment = await CommentRepo.findOne({ where, relations: ['user'] });
+
+        if (!comment) {
+            return {
+                status: 404,
+                response: { message: `comment '${params.id}' not found` }
+            };
+        }
+
+        if (comment.user.id !== user.id) {
+            return {
+                status: 401,
+                response: { message: `comment '${params.id}' is not owned by current user` }
+            };
+        }
+
+        await CommentRepo.update(params.id, body);
+
+        return {
+            status: 200,
+            response: await CommentRepo.findOne({ where })
+        };
+    },
     async delete({ params, user }) {
         const where = { id: params.id };
         const comment = await CommentRepo.findOne({ where, relations: ['user'] });

@@ -10,6 +10,10 @@ module.exports = (app) => {
         utils.handleResponse(() => CommentSvc.create(req), res);
     });
 
+    app.put('/comment/:id', (req, res) => {
+        utils.handleResponse(() => CommentSvc.update(req), res);
+    });
+
     app.delete('/comment/:id', (req, res) => {
         utils.handleResponse(() => CommentSvc.delete(req), res);
     });
