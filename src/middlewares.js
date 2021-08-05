@@ -2,6 +2,9 @@ const typeorm = require('typeorm');
 
 module.exports = {
     async verifyToken(req, res, next) {
+        if (req.url === '/auth' && req.method === 'POST') {
+            return next();
+        }
         // stop req if no token provided or invalid format
         if (!req.headers.authorization || req.headers.authorization.indexOf('Bearer') === -1) {
             return res.status(401).send({

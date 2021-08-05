@@ -3,7 +3,7 @@ const express = require('express');
 const middlewares = require('./src/middlewares');
 const app = express();
 const port = process.env.PORT || 3000;
-const routes = ['tickets', 'comments'];
+const routes = ['tickets', 'comments', 'auth'];
 
 app.use(express.json());
 app.use(middlewares.verifyToken);
