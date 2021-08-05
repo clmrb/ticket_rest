@@ -1,7 +1,6 @@
 const connection = require('typeorm').getConnection();
 
 const TicketRepo = connection.getRepository('Ticket');
-const CommentRepo = connection.getRepository('Comment');
 
 module.exports = {
     async get({ params }) {
@@ -18,23 +17,6 @@ module.exports = {
                 response: { message: `ticket '${params.id}' not found` }
             };
         }
-    },
-    async getComments({ params }) {
-        const exists = await this.get({ params });
-
-        if (exists.status !== 200) {
-            return exists;
-        }
-
-        const comments = await CommentRepo
-            .createQueryBuilder()
-            .where("ticketId = :id", { id: params.id })
-            .getMany();
-
-        return {
-            status: 200,
-            response: comments
-        };
     },
     async create({ body, user }) {
         const ticket = {
