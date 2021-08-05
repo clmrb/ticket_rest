@@ -3,6 +3,21 @@ const connection = require('typeorm').getConnection();
 const TicketRepo = connection.getRepository('Ticket');
 
 module.exports = {
+    async get({ params }) {
+        const ticket = await TicketRepo.findOne({ where: { id: params.id } });
+
+        if (ticket) {
+            return {
+                status: 200,
+                response: ticket
+            };
+        } else {
+            return {
+                status: 404,
+                response: { message: `ticket '${params.id}' not found` }
+            };
+        }
+    },
     async create({ body, user }) {
         const ticket = {
             title: body.title,
