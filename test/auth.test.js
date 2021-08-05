@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 let connection = null;
 let UserRepo = null;
 
-describe('Ticket', () => {
+describe('Auth', () => {
     let testUser = null;
 
     before(async () => {

@@ -13,8 +13,17 @@ let TicketRepo = null;
 let CommentRepo = null;
 let UserRepo = null;
 
+const getJwt = async (mail) => {
+    const res = await chai.request(server)
+        .post('/auth')
+        .send({ mail });
+
+    return res.body.token;
+};
+
 describe('Ticket', () => {
     let testUser = null;
+    let user1Token = null;
 
     before(async () => {
         await ready;
@@ -31,6 +40,8 @@ describe('Ticket', () => {
             username: 'test',
             mail: 'test@testdomain.com'
         });
+        user1Token = await getJwt('test@testdomain.com');
+
     });
 
     describe('GET /ticket/:id', () => {
@@ -45,7 +56,7 @@ describe('Ticket', () => {
 
             const res = await chai.request(server)
                 .get(`/ticket/${ticket.id}`)
-                .set('Authorization', 'Bearer test@testdomain.com');
+                .set('Cookie', `token=${user1Token}`);
 
             res.should.have.status(200);
             res.body.should.be.an('object');
@@ -61,7 +72,7 @@ describe('Ticket', () => {
 
             const res = await chai.request(server)
                 .get(`/ticket/5`)
-                .set('Authorization', 'Bearer test@testdomain.com');
+                .set('Cookie', `token=${user1Token}`);
 
             res.should.have.status(404);
             res.body.should.be.an('object');
@@ -105,7 +116,7 @@ describe('Ticket', () => {
 
             const res = await chai.request(server)
                 .get(`/ticket/${ticketWithComments.id}/comments`)
-                .set('Authorization', 'Bearer test@testdomain.com');
+                .set('Cookie', `token=${user1Token}`);
 
             res.should.have.status(200);
             res.body.should.be.an('array');
@@ -118,7 +129,7 @@ describe('Ticket', () => {
         it('it should not find ticket (404)', async () => {
             const res = await chai.request(server)
                 .get(`/ticket/0/comments`)
-                .set('Authorization', 'Bearer test@testdomain.com');
+                .set('Cookie', `token=${user1Token}`);
 
             res.should.have.status(404);
             res.body.should.be.an('object');
@@ -128,7 +139,7 @@ describe('Ticket', () => {
         it('it should find 0 comments', async () => {
             const res = await chai.request(server)
                 .get(`/ticket/${ticketNoComments.id}/comments`)
-                .set('Authorization', 'Bearer test@testdomain.com');
+                .set('Cookie', `token=${user1Token}`);
 
             res.should.have.status(200);
             res.body.should.be.an('array');
@@ -140,7 +151,7 @@ describe('Ticket', () => {
         it('it should fail to create a comment (404)', async () => {
             const res = await chai.request(server)
                 .post('/ticket/0/comment')
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({
                     text: 'test comment'
                 });
@@ -160,7 +171,7 @@ describe('Ticket', () => {
 
             const res = await chai.request(server)
                 .post(`/ticket/${ticket.id}/comment`)
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({
                     text: 'test comment'
                 });
@@ -196,7 +207,7 @@ describe('Ticket', () => {
                     title: 'Ticket test',
                     description: 'Ticket description'
                 })
-                .set('Authorization', 'test@testdomain.com');
+                .set('Cookie', `token=abcdef`);
 
             res.should.have.status(401);
             res.body.should.be.an('object');
@@ -207,7 +218,7 @@ describe('Ticket', () => {
         it('it should create a ticket', async () => {
             const res = await chai.request(server)
                 .post('/ticket')
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({
                     title: 'Ticket test',
                     description: 'Ticket description'
@@ -224,7 +235,7 @@ describe('Ticket', () => {
         it('it should fail to create a ticket (empty body)', async () => {
             const res = await chai.request(server)
                 .post('/ticket')
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({});
 
             res.should.have.status(500);
@@ -249,7 +260,7 @@ describe('Ticket', () => {
 
             const res = await chai.request(server)
                 .put(`/ticket/${ticketFromTest2.id}`)
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({
                     title: 'Ticket test updated',
                     description: 'Ticket description updated'
@@ -263,7 +274,7 @@ describe('Ticket', () => {
         it('it should fail to update unknown ticket (404)', async () => {
             const res = await chai.request(server)
                 .put('/ticket/0')
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({
                     title: 'Ticket test updated',
                     description: 'Ticket description updated'
@@ -277,7 +288,7 @@ describe('Ticket', () => {
         it('it should create and update the same ticket', async () => {
             const { body: ticket } = await chai.request(server)
                 .post('/ticket')
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({
                     title: 'Ticket test',
                     description: 'Ticket description'
@@ -285,7 +296,7 @@ describe('Ticket', () => {
 
             const res = await chai.request(server)
                 .put(`/ticket/${ticket.id}`)
-                .set('Authorization', 'Bearer test@testdomain.com')
+                .set('Cookie', `token=${user1Token}`)
                 .send({
                     title: 'Ticket test updated',
                     description: 'Ticket description updated'
