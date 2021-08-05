@@ -6,6 +6,10 @@ module.exports = (app) => {
         utils.handleResponse(() => TicketSvc.get(req), res);
     });
 
+    app.get('/ticket/:id/comments', (req, res) => {
+        utils.handleResponse(() => TicketSvc.getComments(req), res);
+    });
+
     app.put('/ticket/:id', (req, res) => {
         utils.handleResponse(() => TicketSvc.update(req), res);
     });
