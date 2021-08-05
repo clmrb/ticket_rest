@@ -1,31 +1,27 @@
-const typeorm = require('typeorm');
+const jwt = require('jsonwebtoken');
+const invalidCredentials = (res) => res.status(401).send({ message: 'no credentials' });
 
 module.exports = {
     async verifyToken(req, res, next) {
         if (req.url === '/auth' && req.method === 'POST') {
             return next();
         }
-        // stop req if no token provided or invalid format
-        if (!req.headers.authorization || req.headers.authorization.indexOf('Bearer') === -1) {
-            return res.status(401).send({
-                message: 'no credentials'
-            });
+
+        if (!req.cookies || !req.cookies.token) {
+            return invalidCredentials(res);
         }
 
-        const mail = req.headers.authorization.replace('Bearer ', '');
-        const UserRepo = typeorm.getConnection().getRepository('User');
+        try {
+            const user = jwt.verify(req.cookies.token, process.env.JWT_SECRET || 'secret');
 
-        const user = await UserRepo.findOne({ where: { mail } });
+            delete user.iat;
+            delete user.exp;
 
-        // stop req if user doesn't exist
-        if (!user) {
-            return res.status(401).send({
-                message: 'invalid credentials'
-            });
+            // token is ok, set user property for future usage
+            req.user = user;
+            next();
+        } catch (e) {
+            return invalidCredentials(res);
         }
-
-        // token is ok, set user property for future usage
-        req.user = user;
-        next();
     }
 };
