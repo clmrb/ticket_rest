@@ -12,6 +12,7 @@ let TicketRepo = null;
 let UserRepo = null;
 
 describe('Ticket', () => {
+    let testUser = null;
 
     before(async () => {
         await ready;
@@ -22,7 +23,7 @@ describe('Ticket', () => {
 
         await TicketRepo.delete({});
         await UserRepo.delete({});
-        await UserRepo.save({
+        testUser = await UserRepo.save({
             username: 'test',
             mail: 'test@testdomain.com'
         });
@@ -30,6 +31,46 @@ describe('Ticket', () => {
 
     // empty ticket table after each test
     afterEach(() => TicketRepo.delete({}));
+
+    describe('GET /ticket/:id', () => {
+        let ticket = null;
+
+        before(async () => {
+            ticket = await TicketRepo.save({
+                user: testUser,
+                title: 'test',
+                description: 'test'
+            });
+        });
+
+        it('it should find a ticket', (done) => {
+            chai.request(server)
+                .get(`/ticket/${ticket.id}`)
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.an('object');
+
+                    res.body.title.should.eql('test');
+                    res.body.description.should.eql('test');
+                    res.body.status.should.eql('todo');
+                    done();
+                });
+        });
+
+        it('it should fail to find a ticket (404)', (done) => {
+            chai.request(server)
+                .get(`/ticket/${ticket.id + 1}`)
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.body.should.be.an('object');
+
+                    should.exist(res.body.message);
+                    done();
+                });
+        });
+    });
 
     describe('POST /ticket', () => {
         it('it should return 401 (no authorization)', (done) => {
