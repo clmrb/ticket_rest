@@ -9,4 +9,8 @@ module.exports = (app) => {
     app.post('/ticket/:id/comment', (req, res) => {
         utils.handleResponse(() => CommentSvc.create(req), res);
     });
+
+    app.delete('/comment/:id', (req, res) => {
+        utils.handleResponse(() => CommentSvc.delete(req), res);
+    });
 };

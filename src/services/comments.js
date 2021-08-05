@@ -41,5 +41,32 @@ module.exports = {
             status: 200,
             response: comments
         };
+    },
+    async delete({ params, user }) {
+        const where = { id: params.id };
+        const comment = await CommentRepo.findOne({ where, relations: ['user'] });
+
+        if (!comment) {
+            return {
+                status: 404,
+                response: { message: `comment '${params.id}' not found` }
+            };
+        }
+
+        if (comment.user.id !== user.id) {
+            return {
+                status: 401,
+                response: { message: `comment '${params.id}' is not owned by current user` }
+            };
+        }
+
+        await CommentRepo.remove(comment);
+
+        delete comment.user;
+
+        return {
+            status: 200,
+            response: comment
+        };
     }
 };
