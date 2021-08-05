@@ -136,6 +136,44 @@ describe('Ticket', () => {
         });
     });
 
+    describe('POST /ticket/:id/comment', () => {
+        it('it should fail to create a comment (404)', async () => {
+            const res = await chai.request(server)
+                .post('/ticket/0/comment')
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .send({
+                    text: 'test comment'
+                });
+
+            res.should.have.status(404);
+            res.body.should.be.an('object');
+
+            should.exist(res.body.message);
+        });
+
+        it('it should create a comment', async () => {
+            const ticket = await TicketRepo.save({
+                user: testUser,
+                title: 'test',
+                description: 'test'
+            });
+
+            const res = await chai.request(server)
+                .post(`/ticket/${ticket.id}/comment`)
+                .set('Authorization', 'Bearer test@testdomain.com')
+                .send({
+                    text: 'test comment'
+                });
+
+            res.should.have.status(200);
+            res.body.should.be.an('object');
+
+            should.exist(res.body.id);
+            should.exist(res.body.createdAt);
+            res.body.text.should.equal('test comment');
+        });
+    });
+
     describe('POST /ticket', () => {
         it('it should return 401 (no authorization)', async () => {
             const res = await chai.request(server)
