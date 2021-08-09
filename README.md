@@ -38,3 +38,20 @@ To run tests :
 ```bash
 npm test
 ```
+
+## Test
+
+Doc is generated using apidocjs (using comments).
+
+To generate the API doc (to be served from a web server) :
+```bash
+npm run doc:generate
+```
+
+To generate the API doc (markdown: APIDOC.md) :
+_Note: generate legacy API doc first (using npm run doc:generate)._
+```bash
+npm run doc:markdown
+```
+
+[See API documentation here.](APIDOC.md)

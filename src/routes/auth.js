@@ -3,6 +3,27 @@ const typeorm = require('typeorm');
 const invalidCredentials = (res) => res.status(401).send({ message: 'no credentials' });
 
 module.exports = (app) => {
+    /**
+     * @api {post} /auth Get a JWT
+     * @apiName GetUser
+     * @apiGroup Auth
+     *
+     * @apiParam {String} mail User mail
+     *
+     * @apiSuccess {String} token JWT
+     *
+     * @apiSuccessExample Ok:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.XbPfbIHMI6arZ3Y922BhjWgQzWXcXNrz0ogtVhfEd2o"
+     *     }
+     *
+     * @apiErrorExample Non autorisé:
+     *     HTTP/1.1 401 Unauthorized
+     *     {
+     *       "message": "invalid credentials"
+     *     }
+     */
     app.post('/auth', async (req, res) => {
         const mail = req.body.mail;
 
