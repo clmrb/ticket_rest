@@ -39,7 +39,7 @@ To run tests :
 npm test
 ```
 
-## Test
+## Doc
 
 Doc is generated using apidocjs (using comments).
 
